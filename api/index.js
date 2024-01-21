@@ -11,30 +11,24 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/restaurants", async (req, res) => {
-  const latitude = req.query.latitude;
-  const longitude = req.query.longitude;
-
-  if (!latitude || !longitude) {
-    return res
-      .status(400)
-      .json({ message: "Location required" });
-  }
+  const { latitude, longitude, category } = req.query;
 
   try {
+    const params = {
+      latitude,
+      longitude,
+      categories: category, // Use the provided category
+      limit: 10,
+    };
+
     const response = await axios.get(
       "https://api.yelp.com/v3/businesses/search",
       {
-        headers: {
-          Authorization: `Bearer ${yelpApiKey}`,
-        },
-        params: {
-          latitude: latitude,
-          longitude: longitude,
-          categories: "restaurants",
-          limit: 20,
-        },
+        headers: { Authorization: `Bearer ${yelpApiKey}` },
+        params: params,
       }
     );
+
     res.json(response.data);
   } catch (error) {
     console.error("Error fetching data from Yelp:", error);
