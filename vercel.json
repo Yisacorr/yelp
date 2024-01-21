@@ -9,9 +9,6 @@
       }
     }
   ],
-  "env": {
-    "yelpApiKey": "@yelp_api_key"
-  },
   "routes": [
     {
       "src": "/api/(.*)",
