@@ -25,7 +25,7 @@ app.get("/api/restaurants", async (req, res) => {
       "https://api.yelp.com/v3/businesses/search",
       {
         headers: {
-          Authorization: `Bearer ${yelpApiKey}`,
+          Authorization: `Bearer U45r0s0HJ09NC_XDq7mqffd-xFFDIaMdZr6IPQqzJbIUY13aYWSpmxNRNbxXZSTXBP1zRW7Y42qqMsR1eehYFy7fy63MNQm_MwHQs3ZsHfcRGYkYwl9Ra5HzcHarZXYx`,
         },
         params: {
           latitude: latitude,
