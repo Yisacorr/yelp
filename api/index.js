@@ -2,7 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
 const app = express();
-const yelpApiKey = process.env.yelpApiKey;
+const yelpApiKey = process.env.YELP_API_KEY;
 
 app.use(cors());
 
@@ -25,7 +25,7 @@ app.get("/api/restaurants", async (req, res) => {
       "https://api.yelp.com/v3/businesses/search",
       {
         headers: {
-          Authorization: `Bearer U45r0s0HJ09NC_XDq7mqffd-xFFDIaMdZr6IPQqzJbIUY13aYWSpmxNRNbxXZSTXBP1zRW7Y42qqMsR1eehYFy7fy63MNQm_MwHQs3ZsHfcRGYkYwl9Ra5HzcHarZXYx`,
+          Authorization: `Bearer ${yelpApiKey}`,
         },
         params: {
           latitude: latitude,
