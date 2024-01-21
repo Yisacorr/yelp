@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node",
+      "config": {
+        "nodeVersion": "14.x"
+      }
+    }
+  ],
+  "env": {
+    "yelpApiKey": "@yelp_api_key"
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "api/index.js"
+    }
+  ]
+}
