@@ -24,7 +24,7 @@ app.get("/api/restaurants", async (req, res) => {
       location, // Add location for zip code search
       term: searchQuery, // `term` can be used to search for text within Yelp
       categories: category,
-      limit: 20,
+      limit: 15,
     };
 
     // Remove any undefined or empty parameters
