@@ -15,12 +15,13 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 app.get("/api/restaurants", async (req, res) => {
-  const { latitude, longitude, category, searchQuery } = req.query;
+  const { latitude, longitude, category, searchQuery, location } = req.query;
 
   try {
     const params = {
       latitude,
       longitude,
+      location, // Add location for zip code search
       term: searchQuery, // `term` can be used to search for text within Yelp
       categories: category,
       limit: 10,
