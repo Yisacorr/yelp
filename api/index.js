@@ -14,6 +14,7 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
+// Existing endpoint for restaurant search
 app.get("/api/restaurants", async (req, res) => {
   const { latitude, longitude, category, searchQuery, location } = req.query;
 
@@ -52,6 +53,31 @@ app.get("/api/restaurants", async (req, res) => {
     );
     res.status(500).json({
       message: "Error fetching data from Yelp",
+      details: error.message,
+    });
+  }
+});
+
+// New endpoint for fetching photos
+app.get("/api/yelp/photos/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const response = await axios.get(
+      `https://api.yelp.com/v3/businesses/${id}`,
+      {
+        headers: { Authorization: `Bearer ${yelpApiKey}` },
+      }
+    );
+
+    res.json(response.data.photos);
+  } catch (error) {
+    console.error(
+      "Error fetching photos from Yelp:",
+      error.response || error.message
+    );
+    res.status(500).json({
+      message: "Error fetching photos from Yelp",
       details: error.message,
     });
   }
