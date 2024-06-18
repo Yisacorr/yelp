@@ -61,6 +61,7 @@ app.get("/api/restaurants", async (req, res) => {
 // New endpoint for fetching photos
 app.get("/api/yelp/photos/:id", async (req, res) => {
   const { id } = req.params;
+  console.log(`Fetching photos for restaurant ID: ${id}`); // Log the ID
 
   try {
     const response = await axios.get(
@@ -70,15 +71,16 @@ app.get("/api/yelp/photos/:id", async (req, res) => {
       }
     );
 
+    console.log("Response from Yelp:", response.data); // Log the response data
     res.json(response.data.photos);
   } catch (error) {
     console.error(
       "Error fetching photos from Yelp:",
-      error.response || error.message
+      error.response ? error.response.data : error.message
     );
     res.status(500).json({
       message: "Error fetching photos from Yelp",
-      details: error.message,
+      details: error.response ? error.response.data : error.message,
     });
   }
 });
