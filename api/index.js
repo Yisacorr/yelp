@@ -59,7 +59,7 @@ app.get("/api/restaurants", async (req, res) => {
 });
 
 // New endpoint for fetching photos
-app.get("/api/yelp/photos/:id", async (req, res) => {
+app.get("/api/photos/:id", async (req, res) => {
   const { id } = req.params;
   console.log(`Fetching photos for restaurant ID: ${id}`); // Log the ID
 
