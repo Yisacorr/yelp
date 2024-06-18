@@ -1,11 +1,20 @@
+require("dotenv").config();
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
 const app = express();
+
 const yelpApiKey = process.env.YELP_API_KEY;
 
-app.use(cors());
-app.use(express.json()); // To parse JSON bodies
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("Welcome to the Yelp Proxy Server!");
@@ -21,20 +30,19 @@ app.get("/api/restaurants", async (req, res) => {
     const params = {
       latitude,
       longitude,
-      location, // Add location for zip code search
-      term: searchQuery, // `term` can be used to search for text within Yelp
+      location,
+      term: searchQuery,
       categories: category,
       limit: 15,
     };
 
-    // Remove any undefined or empty parameters
     Object.keys(params).forEach((key) => {
       if (params[key] === undefined || params[key] === "") {
         delete params[key];
       }
     });
 
-    console.log("Requesting Yelp with params:", params); // Added for debugging
+    console.log("Requesting Yelp with params:", params);
 
     const response = await axios.get(
       "https://api.yelp.com/v3/businesses/search",
@@ -48,11 +56,37 @@ app.get("/api/restaurants", async (req, res) => {
   } catch (error) {
     console.error(
       "Error fetching data from Yelp:",
-      error.response || error.message
+      error.response ? error.response.data : error.message
     );
     res.status(500).json({
       message: "Error fetching data from Yelp",
-      details: error.message,
+      details: error.response ? error.response.data : error.message,
+    });
+  }
+});
+
+app.get("/api/yelp/photos/:id", async (req, res) => {
+  const { id } = req.params;
+  console.log(`Fetching photos for restaurant ID: ${id}`);
+
+  try {
+    const response = await axios.get(
+      `https://api.yelp.com/v3/businesses/${id}`,
+      {
+        headers: { Authorization: `Bearer ${yelpApiKey}` },
+      }
+    );
+
+    console.log("Response from Yelp:", response.data);
+    res.json(response.data.photos);
+  } catch (error) {
+    console.error(
+      "Error fetching photos from Yelp:",
+      error.response ? error.response.data : error.message
+    );
+    res.status(500).json({
+      message: "Error fetching photos from Yelp",
+      details: error.response ? error.response.data : error.message,
     });
   }
 });
