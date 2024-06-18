@@ -2,6 +2,8 @@ const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
 const app = express();
+require("dotenv").config(); // Load environment variables
+
 const yelpApiKey = process.env.YELP_API_KEY;
 
 app.use(cors());
