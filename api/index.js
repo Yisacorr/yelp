@@ -89,3 +89,30 @@ app.get("/api/yelp/business/:id", async (req, res) => {
     });
   }
 });
+app.get("/api/restaurant-images/:id", async (req, res) => {
+  const { id } = req.params;
+  console.log(`Fetching images for restaurant ID: ${id}`);
+
+  try {
+    const response = await axios.get(
+      `https://api.yelp.com/v3/businesses/${id}`,
+      {
+        headers: { Authorization: `Bearer ${yelpApiKey}` },
+      }
+    );
+
+    // Extract up to 5 images from the response
+    const images = response.data.photos.slice(0, 5);
+
+    res.json({ images });
+  } catch (error) {
+    console.error(
+      "Error fetching restaurant images from Yelp:",
+      error.response ? error.response.data : error.message
+    );
+    res.status(500).json({
+      message: "Error fetching restaurant images from Yelp",
+      details: error.response ? error.response.data : error.message,
+    });
+  }
+});
