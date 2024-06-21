@@ -1,3 +1,5 @@
+require("dotenv").config(); // Load environment variables
+
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
@@ -64,31 +66,6 @@ app.get("/api/restaurants", async (req, res) => {
   }
 });
 
-app.get("/api/yelp/business/:id", async (req, res) => {
-  const { id } = req.params;
-  console.log(`Fetching details for restaurant ID: ${id}`);
-
-  try {
-    const response = await axios.get(
-      `https://api.yelp.com/v3/businesses/${id}`,
-      {
-        headers: { Authorization: `Bearer ${yelpApiKey}` },
-      }
-    );
-
-    console.log("Response from Yelp:", response.data);
-    res.json(response.data); // Return the entire business details
-  } catch (error) {
-    console.error(
-      "Error fetching business details from Yelp:",
-      error.response ? error.response.data : error.message
-    );
-    res.status(500).json({
-      message: "Error fetching business details from Yelp",
-      details: error.response ? error.response.data : error.message,
-    });
-  }
-});
 app.get("/api/restaurant-images/:id", async (req, res) => {
   const { id } = req.params;
   console.log(`Fetching images for restaurant ID: ${id}`);
