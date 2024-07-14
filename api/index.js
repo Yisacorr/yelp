@@ -90,4 +90,5 @@ app.get("/api/yelp/business/:id", async (req, res) => {
   }
 });
 
+// Include the cron job
 require("./cronJob");
