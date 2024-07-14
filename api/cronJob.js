@@ -40,3 +40,5 @@ cron.schedule("0 0 */3 * *", () => {
   console.log("Running the keep-alive task...");
   keepAlive();
 });
+
+console.log("Cron job scheduled to run every 3 days.");

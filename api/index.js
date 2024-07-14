@@ -1,9 +1,12 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
-const app = express();
+const { createClient } = require("@supabase/supabase-js");
 
+const app = express();
 const yelpApiKey = process.env.YELP_API_KEY;
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
 
 app.use(
   cors({
@@ -90,5 +93,37 @@ app.get("/api/yelp/business/:id", async (req, res) => {
   }
 });
 
-// Include the cron job
-require("./cronJob");
+// Keep-alive endpoint
+app.get("/keep-alive", async (req, res) => {
+  if (!supabaseUrl || !supabaseKey) {
+    console.error(
+      "Supabase URL and Key must be provided as environment variables"
+    );
+    res
+      .status(500)
+      .json({
+        error: "Supabase URL and Key must be provided as environment variables",
+      });
+    return;
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  try {
+    const { data, error } = await supabase
+      .from("experiences")
+      .select("*")
+      .limit(1);
+
+    if (error) {
+      console.error("Error keeping the database alive:", error);
+      res.status(500).json({ error });
+    } else {
+      console.log("Keep alive query successful:", data);
+      res.json({ message: "Keep alive query successful", data });
+    }
+  } catch (error) {
+    console.error("Error executing keep alive query:", error);
+    res.status(500).json({ error });
+  }
+});
