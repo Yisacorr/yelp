@@ -3,9 +3,8 @@
 const { createClient } = require("@supabase/supabase-js");
 const cron = require("node-cron");
 
-// Initialize Supabase client
-const supabaseUrl = "https://your-project-url.supabase.co";
-const supabaseKey = "public-anon-key";
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Function to perform the keep-alive task
@@ -13,7 +12,7 @@ const keepAlive = async () => {
   try {
     // This can be any simple query that keeps the database active
     const { data, error } = await supabase
-      .from("your_table")
+      .from("experiences")
       .select("*")
       .limit(1);
 
