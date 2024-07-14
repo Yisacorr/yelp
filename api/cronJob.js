@@ -35,7 +35,7 @@ const keepAlive = async () => {
 };
 
 // Schedule the task to run every 3 days
-cron.schedule("* * * * *", () => {
+cron.schedule("0 0 */3 * *", () => {
   console.log("Running the keep-alive task...");
   keepAlive();
 });
