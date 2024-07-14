@@ -89,3 +89,5 @@ app.get("/api/yelp/business/:id", async (req, res) => {
     });
   }
 });
+
+require("./cronJob");
