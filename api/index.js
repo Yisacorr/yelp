@@ -8,6 +8,18 @@ const yelpApiKey = process.env.YELP_API_KEY;
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
+if (!supabaseUrl || !supabaseKey) {
+  console.error(
+    "Supabase URL and Key must be provided as environment variables"
+  );
+  process.exit(1);
+}
+
+console.log("Supabase URL:", supabaseUrl);
+console.log("Supabase Key:", supabaseKey);
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 app.use(
   cors({
     origin: "*",
@@ -95,20 +107,6 @@ app.get("/api/yelp/business/:id", async (req, res) => {
 
 // Keep-alive endpoint
 app.get("/keep-alive", async (req, res) => {
-  if (!supabaseUrl || !supabaseKey) {
-    console.error(
-      "Supabase URL and Key must be provided as environment variables"
-    );
-    res
-      .status(500)
-      .json({
-        error: "Supabase URL and Key must be provided as environment variables",
-      });
-    return;
-  }
-
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
   try {
     const { data, error } = await supabase
       .from("experiences")

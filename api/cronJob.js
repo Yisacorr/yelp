@@ -1,5 +1,3 @@
-// cronJob.js
-
 const { createClient } = require("@supabase/supabase-js");
 const cron = require("node-cron");
 
@@ -19,6 +17,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // Function to perform the keep-alive task
 const keepAlive = async () => {
   try {
+    console.log("Executing keep-alive query...");
     // This can be any simple query that keeps the database active
     const { data, error } = await supabase
       .from("experiences")
@@ -28,10 +27,10 @@ const keepAlive = async () => {
     if (error) {
       console.error("Error keeping the database alive:", error);
     } else {
-      console.log("Keep alive query successful:", data);
+      console.log("Keep-alive query successful:", data);
     }
   } catch (error) {
-    console.error("Error executing keep alive query:", error);
+    console.error("Error executing keep-alive query:", error);
   }
 };
 

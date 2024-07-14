@@ -5,6 +5,7 @@
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",
+    "start-cron": "node cronJob.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
