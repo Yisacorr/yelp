@@ -90,6 +90,40 @@ app.get("/api/location-suggestions", async (req, res) => {
   }
 });
 
+// Yelp API endpoint to fetch name suggestions
+app.get("/api/name-suggestions", async (req, res) => {
+  const query = req.query.q;
+
+  if (!query) {
+    return res.status(400).json({ error: "Query parameter 'q' is required" });
+  }
+
+  const yelpApiKey = process.env.YELP_API_KEY;
+
+  if (!yelpApiKey) {
+    return res.status(500).json({ error: "Yelp API key not configured" });
+  }
+
+  try {
+    const response = await axios.get("https://api.yelp.com/v3/autocomplete", {
+      headers: {
+        Authorization: `Bearer ${yelpApiKey}`,
+      },
+      params: {
+        text: query,
+        location: "US", // Default location, you can customize this as needed
+      },
+    });
+
+    const suggestions = response.data.terms.map((term) => term.text);
+
+    res.json(suggestions);
+  } catch (error) {
+    console.error("Error fetching name suggestions from Yelp:", error);
+    res.status(500).json({ error: "Failed to fetch name suggestions" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
