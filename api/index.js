@@ -5,19 +5,19 @@ const cors = require("cors");
 const cron = require("node-cron");
 
 const app = express();
-const yelpApiKey = process.env.YELP_API_KEY;
+const PORT = process.env.PORT || 3001;
+
+// Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
+const yelpApiKey = process.env.YELP_API_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
+if (!supabaseUrl || !supabaseKey || !yelpApiKey) {
   console.error(
-    "Supabase URL and Key must be provided as environment variables"
+    "Supabase URL, Key, and Yelp API key must be provided as environment variables"
   );
   process.exit(1);
 }
-
-console.log("Supabase URL:", supabaseUrl);
-console.log("Supabase Key:", supabaseKey);
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -35,10 +35,6 @@ app.get("/", (req, res) => {
   res.send("Welcome to the Yelp Proxy Server!");
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-// Yelp API endpoint to fetch restaurant data
 app.get("/api/restaurants", async (req, res) => {
   const { latitude, longitude, category, searchQuery, location } = req.query;
 
@@ -81,7 +77,6 @@ app.get("/api/restaurants", async (req, res) => {
   }
 });
 
-// Yelp API endpoint to fetch business details
 app.get("/api/yelp/business/:id", async (req, res) => {
   const { id } = req.params;
   console.log(`Fetching details for restaurant ID: ${id}`);
