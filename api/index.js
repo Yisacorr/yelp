@@ -105,6 +105,7 @@ app.get("/api/yelp/business/:id", async (req, res) => {
   }
 });
 
+// Endpoint for name suggestions
 app.get("/api/name-suggestions", async (req, res) => {
   const query = req.query.q;
 
@@ -121,7 +122,7 @@ app.get("/api/name-suggestions", async (req, res) => {
         },
         params: {
           term: query,
-          location: "US", // Default location, you can customize this as needed
+          location: "US",
           limit: 5,
         },
       }
@@ -138,6 +139,7 @@ app.get("/api/name-suggestions", async (req, res) => {
   }
 });
 
+// Endpoint for location suggestions based on name
 app.get("/api/location-suggestions", async (req, res) => {
   const query = req.query.q;
 
@@ -154,7 +156,7 @@ app.get("/api/location-suggestions", async (req, res) => {
         },
         params: {
           term: query,
-          location: "US", // Default location, you can customize this as needed
+          location: "US",
           limit: 5,
         },
       }
