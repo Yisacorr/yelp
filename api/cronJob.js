@@ -1,10 +1,5 @@
 const { createClient } = require("@supabase/supabase-js");
-const express = require("express");
-const axios = require("axios");
 const cron = require("node-cron");
-
-const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -23,6 +18,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const keepAlive = async () => {
   try {
     console.log("Executing keep-alive query...");
+    // This can be any simple query that keeps the database active
     const { data, error } = await supabase
       .from("experiences")
       .select("*")
@@ -45,85 +41,3 @@ cron.schedule("0 0 */3 * *", () => {
 });
 
 console.log("Cron job scheduled to run every 3 days.");
-
-// Middleware to parse JSON bodies
-app.use(express.json());
-
-// Yelp API endpoint to fetch location suggestions
-app.get("/api/location-suggestions", async (req, res) => {
-  const query = req.query.q;
-
-  if (!query) {
-    return res.status(400).json({ error: "Query parameter 'q' is required" });
-  }
-
-  const yelpApiKey = process.env.YELP_API_KEY;
-
-  if (!yelpApiKey) {
-    return res.status(500).json({ error: "Yelp API key not configured" });
-  }
-
-  try {
-    const response = await axios.get(
-      "https://api.yelp.com/v3/businesses/search",
-      {
-        headers: {
-          Authorization: `Bearer ${yelpApiKey}`,
-        },
-        params: {
-          term: query,
-          location: "US", // Default location, you can customize this as needed
-          limit: 5,
-        },
-      }
-    );
-
-    const suggestions = response.data.businesses.map((business) => ({
-      name: business.name,
-      address: business.location.display_address.join(", "),
-    }));
-
-    res.json(suggestions);
-  } catch (error) {
-    console.error("Error fetching location suggestions from Yelp:", error);
-    res.status(500).json({ error: "Failed to fetch location suggestions" });
-  }
-});
-
-// Yelp API endpoint to fetch name suggestions
-app.get("/api/name-suggestions", async (req, res) => {
-  const query = req.query.q;
-
-  if (!query) {
-    return res.status(400).json({ error: "Query parameter 'q' is required" });
-  }
-
-  const yelpApiKey = process.env.YELP_API_KEY;
-
-  if (!yelpApiKey) {
-    return res.status(500).json({ error: "Yelp API key not configured" });
-  }
-
-  try {
-    const response = await axios.get("https://api.yelp.com/v3/autocomplete", {
-      headers: {
-        Authorization: `Bearer ${yelpApiKey}`,
-      },
-      params: {
-        text: query,
-        location: "US", // Default location, you can customize this as needed
-      },
-    });
-
-    const suggestions = response.data.terms.map((term) => term.text);
-
-    res.json(suggestions);
-  } catch (error) {
-    console.error("Error fetching name suggestions from Yelp:", error);
-    res.status(500).json({ error: "Failed to fetch name suggestions" });
-  }
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
