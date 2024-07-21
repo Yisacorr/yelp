@@ -5,20 +5,13 @@ const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
 const yelpApiKey = process.env.YELP_API_KEY;
-const foursquareClientId = process.env.FOURSQUARE_CLIENT_ID;
-const foursquareClientSecret = process.env.FOURSQUARE_CLIENT_SECRET;
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
+const foursquareApiKey = process.env.FOURSQUARE_API_KEY;
 
-if (
-  !supabaseUrl ||
-  !supabaseKey ||
-  !yelpApiKey ||
-  !foursquareClientId ||
-  !foursquareClientSecret
-) {
+if (!supabaseUrl || !supabaseKey || !foursquareApiKey) {
   console.error(
-    "Supabase URL, Key, Yelp API key, Foursquare Client ID, and Foursquare Client Secret must be provided as environment variables"
+    "Supabase URL, Key, and Foursquare API key must be provided as environment variables"
   );
   process.exit(1);
 }
@@ -39,7 +32,7 @@ app.use(
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("Welcome to the API Proxy Server!");
+  res.send("Welcome to the Yelp Proxy Server!");
 });
 
 const PORT = process.env.PORT || 3001;
@@ -113,76 +106,7 @@ app.get("/api/yelp/business/:id", async (req, res) => {
   }
 });
 
-// Endpoint for name suggestions
-app.get("/api/name-suggestions", async (req, res) => {
-  const query = req.query.q;
-
-  if (!query) {
-    return res.status(400).json({ error: "Query parameter 'q' is required" });
-  }
-
-  try {
-    const response = await axios.get(
-      "https://api.yelp.com/v3/businesses/search",
-      {
-        headers: {
-          Authorization: `Bearer ${yelpApiKey}`,
-        },
-        params: {
-          term: query,
-          location: "US",
-          limit: 5,
-        },
-      }
-    );
-
-    const suggestions = response.data.businesses.map((business) => ({
-      name: business.name,
-    }));
-
-    res.json(suggestions);
-  } catch (error) {
-    console.error("Error fetching name suggestions from Yelp:", error);
-    res.status(500).json({ error: "Failed to fetch name suggestions" });
-  }
-});
-
-// Endpoint for location suggestions based on name
-app.get("/api/location-suggestions", async (req, res) => {
-  const query = req.query.q;
-
-  if (!query) {
-    return res.status(400).json({ error: "Query parameter 'q' is required" });
-  }
-
-  try {
-    const response = await axios.get(
-      "https://api.yelp.com/v3/businesses/search",
-      {
-        headers: {
-          Authorization: `Bearer ${yelpApiKey}`,
-        },
-        params: {
-          term: query,
-          location: "US",
-          limit: 5,
-        },
-      }
-    );
-
-    const suggestions = response.data.businesses.map((business) => ({
-      name: business.name,
-      address: business.location.display_address.join(", "),
-    }));
-
-    res.json(suggestions);
-  } catch (error) {
-    console.error("Error fetching location suggestions from Yelp:", error);
-    res.status(500).json({ error: "Failed to fetch location suggestions" });
-  }
-});
-
-// Endpoint to fetch menu from Foursquare
+// Endpoint for fetching menu from Foursquare
 app.get("/api/menu", async (req, res) => {
   const { venueId } = req.query;
 
@@ -197,9 +121,9 @@ app.get("/api/menu", async (req, res) => {
       `https://api.foursquare.com/v2/venues/${venueId}/menu`,
       {
         params: {
-          client_id: foursquareClientId,
-          client_secret: foursquareClientSecret,
-          v: "20230721",
+          client_id: process.env.FOURSQUARE_CLIENT_ID,
+          client_secret: process.env.FOURSQUARE_CLIENT_SECRET,
+          v: "20210731", // Use the current date as the version
         },
       }
     );
@@ -207,7 +131,7 @@ app.get("/api/menu", async (req, res) => {
     res.json(response.data.response.menu);
   } catch (error) {
     console.error("Error fetching menu from Foursquare:", error);
-    res.status(500).json({ error: "Failed to fetch menu from Foursquare" });
+    res.status(500).json({ error: "Failed to fetch menu" });
   }
 });
 
