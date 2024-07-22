@@ -7,11 +7,17 @@ const app = express();
 const yelpApiKey = process.env.YELP_API_KEY;
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
-const foursquareApiKey = process.env.FOURSQUARE_API_KEY;
+const foursquareClientId = process.env.FOURSQUARE_CLIENT_ID;
+const foursquareClientSecret = process.env.FOURSQUARE_CLIENT_SECRET;
 
-if (!supabaseUrl || !supabaseKey || !foursquareApiKey) {
+if (
+  !supabaseUrl ||
+  !supabaseKey ||
+  !foursquareClientId ||
+  !foursquareClientSecret
+) {
   console.error(
-    "Supabase URL, Key, and Foursquare API key must be provided as environment variables"
+    "Supabase URL, Key, Foursquare Client ID, and Client Secret must be provided as environment variables"
   );
   process.exit(1);
 }
@@ -121,8 +127,8 @@ app.get("/api/menu", async (req, res) => {
       `https://api.foursquare.com/v2/venues/${venueId}/menu`,
       {
         params: {
-          client_id: process.env.FOURSQUARE_CLIENT_ID,
-          client_secret: process.env.FOURSQUARE_CLIENT_SECRET,
+          client_id: foursquareClientId,
+          client_secret: foursquareClientSecret,
           v: "20210731", // Use the current date as the version
         },
       }
