@@ -113,28 +113,26 @@ app.get("/api/yelp/business/:id", async (req, res) => {
 
 // Endpoint for fetching menu from Foursquare
 app.get("/api/menu", async (req, res) => {
-  const venueId = req.query.venueId;
+  const { venueId } = req.query;
 
   if (!venueId) {
-    console.error("No venue ID provided");
-    return res.status(400).json({ error: "No venue ID provided" });
+    return res
+      .status(400)
+      .json({ error: "Query parameter 'venueId' is required" });
   }
 
+  console.log(`Fetching menu for venue ID: ${venueId}`);
+
   try {
-    console.log(`Fetching menu for venue ID: ${venueId}`);
-    const response = await axios.get(
-      `https://api.foursquare.com/v3/places/${venueId}/menu`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.FOURSQUARE_API_KEY}`,
-        },
-      }
-    );
-    console.log("Menu data fetched successfully:", response.data);
+    const response = await fsqDevelopers.placeDetails({ fsq_id: venueId });
+    console.log("Response from Foursquare:", response.data);
     res.json(response.data);
   } catch (error) {
-    console.error("Failed to fetch menu from Foursquare:", error);
-    res.status(500).json({ error: "Failed to fetch menu from Foursquare" });
+    console.error("Error fetching menu from Foursquare:", error);
+    if (error.response) {
+      console.error("Response data:", error.response.data);
+    }
+    res.status(500).json({ error: "Failed to fetch menu" });
   }
 });
 
