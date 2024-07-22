@@ -125,7 +125,6 @@ app.get("/api/menu", async (req, res) => {
 
   try {
     const response = await fsqDevelopers.placeDetails({ fsq_id: venueId });
-
     console.log("Response from Foursquare:", response.data);
     res.json(response.data);
   } catch (error) {
