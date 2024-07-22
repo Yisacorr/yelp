@@ -2,30 +2,29 @@ const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
 const { createClient } = require("@supabase/supabase-js");
+const fsqDevelopers = require("@api/fsq-developers"); // Import Foursquare API package
 
 const app = express();
 const yelpApiKey = process.env.YELP_API_KEY;
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
-const foursquareClientId = process.env.FOURSQUARE_CLIENT_ID;
-const foursquareClientSecret = process.env.FOURSQUARE_CLIENT_SECRET;
+const foursquareApiKey = process.env.FOURSQUARE_API_KEY; // Add Foursquare API Key
 
-if (
-  !supabaseUrl ||
-  !supabaseKey ||
-  !foursquareClientId ||
-  !foursquareClientSecret
-) {
+if (!supabaseUrl || !supabaseKey || !foursquareApiKey) {
   console.error(
-    "Supabase URL, Key, Foursquare Client ID, and Client Secret must be provided as environment variables"
+    "Supabase URL, Key, and Foursquare API Key must be provided as environment variables"
   );
   process.exit(1);
 }
 
 console.log("Supabase URL:", supabaseUrl);
 console.log("Supabase Key:", supabaseKey);
+console.log("Foursquare API Key:", foursquareApiKey);
 
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Initialize Foursquare API client
+fsqDevelopers.auth(foursquareApiKey);
 
 app.use(
   cors({
@@ -38,7 +37,7 @@ app.use(
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("Welcome to the Yelp Proxy Server!");
+  res.send("Welcome to the API Proxy Server!");
 });
 
 const PORT = process.env.PORT || 3001;
@@ -125,19 +124,10 @@ app.get("/api/menu", async (req, res) => {
   console.log(`Fetching menu for venue ID: ${venueId}`);
 
   try {
-    const response = await axios.get(
-      `https://api.foursquare.com/v2/venues/${venueId}/menu`,
-      {
-        params: {
-          client_id: foursquareClientId,
-          client_secret: foursquareClientSecret,
-          v: "20210731", // Use the current date as the version
-        },
-      }
-    );
+    const response = await fsqDevelopers.placeTips({ fsq_id: venueId });
 
-    console.log("Response from Foursquare:", response.data.response.menu);
-    res.json(response.data.response.menu);
+    console.log("Response from Foursquare:", response.data);
+    res.json(response.data);
   } catch (error) {
     console.error("Error fetching menu from Foursquare:", error);
     if (error.response) {
