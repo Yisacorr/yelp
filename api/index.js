@@ -136,6 +136,52 @@ app.get("/api/menu", async (req, res) => {
   }
 });
 
+app.get("/api/foursquare-venue-id", async (req, res) => {
+  const { name, latitude, longitude } = req.query;
+
+  if (!name || !latitude || !longitude) {
+    return res
+      .status(400)
+      .json({
+        error:
+          "Query parameters 'name', 'latitude', and 'longitude' are required",
+      });
+  }
+
+  console.log(
+    `Fetching Foursquare venue ID for name: ${name}, latitude: ${latitude}, longitude: ${longitude}`
+  );
+
+  try {
+    const response = await axios.get(
+      "https://api.foursquare.com/v3/places/search",
+      {
+        headers: {
+          Authorization: `Bearer ${foursquareApiKey}`,
+        },
+        params: {
+          query: name,
+          ll: `${latitude},${longitude}`,
+          limit: 1,
+        },
+      }
+    );
+
+    if (response.data.results.length > 0) {
+      const venueId = response.data.results[0].fsq_id;
+      res.json({ venueId });
+    } else {
+      res.status(404).json({ error: "Venue not found" });
+    }
+  } catch (error) {
+    console.error("Error fetching Foursquare venue ID:", error);
+    if (error.response) {
+      console.error("Response data:", error.response.data);
+    }
+    res.status(500).json({ error: "Failed to fetch Foursquare venue ID" });
+  }
+});
+
 // Keep-alive endpoint
 app.get("/keep-alive", async (req, res) => {
   try {
