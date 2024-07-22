@@ -122,6 +122,8 @@ app.get("/api/menu", async (req, res) => {
       .json({ error: "Query parameter 'venueId' is required" });
   }
 
+  console.log(`Fetching menu for venue ID: ${venueId}`);
+
   try {
     const response = await axios.get(
       `https://api.foursquare.com/v2/venues/${venueId}/menu`,
@@ -134,9 +136,13 @@ app.get("/api/menu", async (req, res) => {
       }
     );
 
+    console.log("Response from Foursquare:", response.data.response.menu);
     res.json(response.data.response.menu);
   } catch (error) {
     console.error("Error fetching menu from Foursquare:", error);
+    if (error.response) {
+      console.error("Response data:", error.response.data);
+    }
     res.status(500).json({ error: "Failed to fetch menu" });
   }
 });
