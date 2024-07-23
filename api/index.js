@@ -2,6 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
 const { createClient } = require("@supabase/supabase-js");
+const fsqDevelopers = require("@api/fsq-developers");
 
 const app = express();
 const yelpApiKey = process.env.YELP_API_KEY;
@@ -21,6 +22,8 @@ console.log("Supabase Key:", supabaseKey);
 console.log("Foursquare API Key:", foursquareApiKey);
 
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+fsqDevelopers.auth(foursquareApiKey);
 
 app.use(
   cors({
@@ -167,14 +170,7 @@ app.get("/api/menu", async (req, res) => {
   console.log(`Fetching menu for venue ID: ${venueId}`);
 
   try {
-    const response = await axios.get(
-      `https://api.foursquare.com/v3/places/${venueId}/menu`,
-      {
-        headers: {
-          Authorization: `Bearer ${foursquareApiKey}`,
-        },
-      }
-    );
+    const response = await fsqDevelopers.placeDetails({ fsq_id: venueId });
     console.log("Response from Foursquare:", response.data);
     res.json(response.data);
   } catch (error) {
