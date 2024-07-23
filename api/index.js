@@ -2,13 +2,13 @@ const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
 const { createClient } = require("@supabase/supabase-js");
-const fsqDevelopers = require("@api/fsq-developers"); // Import Foursquare API package
+const fsqDevelopers = require("@api/fsq-developers");
 
 const app = express();
 const yelpApiKey = process.env.YELP_API_KEY;
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
-const foursquareApiKey = process.env.FOURSQUARE_API_KEY; // Add Foursquare API Key
+const foursquareApiKey = process.env.FOURSQUARE_API_KEY;
 
 if (!supabaseUrl || !supabaseKey || !foursquareApiKey) {
   console.error(
@@ -23,7 +23,6 @@ console.log("Foursquare API Key:", foursquareApiKey);
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Initialize Foursquare API client
 fsqDevelopers.auth(foursquareApiKey);
 
 app.use(
@@ -98,7 +97,7 @@ app.get("/api/yelp/business/:id", async (req, res) => {
     );
 
     console.log("Response from Yelp:", response.data);
-    res.json(response.data); // Return the entire business details
+    res.json(response.data);
   } catch (error) {
     console.error(
       "Error fetching business details from Yelp:",
@@ -111,32 +110,7 @@ app.get("/api/yelp/business/:id", async (req, res) => {
   }
 });
 
-// Endpoint for fetching menu from Foursquare
-app.get("/api/menu", async (req, res) => {
-  const { venueId } = req.query;
-
-  if (!venueId) {
-    return res
-      .status(400)
-      .json({ error: "Query parameter 'venueId' is required" });
-  }
-
-  console.log(`Fetching menu for venue ID: ${venueId}`);
-
-  try {
-    const response = await fsqDevelopers.placeDetails({ fsq_id: venueId });
-    console.log("Response from Foursquare:", response.data);
-    res.json(response.data);
-  } catch (error) {
-    console.error("Error fetching menu from Foursquare:", error);
-    if (error.response) {
-      console.error("Response data:", error.response.data);
-    }
-    res.status(500).json({ error: "Failed to fetch menu" });
-  }
-});
-
-// Endpoint to get Foursquare venue ID
+// Endpoint for fetching Foursquare venue ID
 app.get("/api/foursquare-venue-id", async (req, res) => {
   const { name, latitude, longitude } = req.query;
 
@@ -168,10 +142,10 @@ app.get("/api/foursquare-venue-id", async (req, res) => {
 
     if (response.data.results.length > 0) {
       const venueId = response.data.results[0].fsq_id;
-      console.log("Found venue ID:", venueId);
+      console.log(`Found venue ID: ${venueId}`);
       res.json({ venueId });
     } else {
-      console.log("Venue not found");
+      console.log("No venue found");
       res.status(404).json({ error: "Venue not found" });
     }
   } catch (error) {
@@ -180,6 +154,31 @@ app.get("/api/foursquare-venue-id", async (req, res) => {
       console.error("Response data:", error.response.data);
     }
     res.status(500).json({ error: "Failed to fetch Foursquare venue ID" });
+  }
+});
+
+// Endpoint for fetching menu from Foursquare
+app.get("/api/menu", async (req, res) => {
+  const { venueId } = req.query;
+
+  if (!venueId) {
+    return res
+      .status(400)
+      .json({ error: "Query parameter 'venueId' is required" });
+  }
+
+  console.log(`Fetching menu for venue ID: ${venueId}`);
+
+  try {
+    const response = await fsqDevelopers.placeDetails({ fsq_id: venueId });
+    console.log("Response from Foursquare:", response.data);
+    res.json(response.data);
+  } catch (error) {
+    console.error("Error fetching menu from Foursquare:", error);
+    if (error.response) {
+      console.error("Response data:", error.response.data);
+    }
+    res.status(500).json({ error: "Failed to fetch menu" });
   }
 });
 
