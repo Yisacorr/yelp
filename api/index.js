@@ -170,7 +170,14 @@ app.get("/api/menu", async (req, res) => {
   console.log(`Fetching menu for venue ID: ${venueId}`);
 
   try {
-    const response = await fsqDevelopers.placeDetails({ fsq_id: venueId });
+    const response = await axios.get(
+      `https://api.foursquare.com/v3/places/${venueId}/menu`,
+      {
+        headers: {
+          Authorization: `Bearer ${foursquareApiKey}`,
+        },
+      }
+    );
     console.log("Response from Foursquare:", response.data);
     res.json(response.data);
   } catch (error) {
