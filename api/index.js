@@ -136,16 +136,15 @@ app.get("/api/menu", async (req, res) => {
   }
 });
 
+// Endpoint to get Foursquare venue ID
 app.get("/api/foursquare-venue-id", async (req, res) => {
   const { name, latitude, longitude } = req.query;
 
   if (!name || !latitude || !longitude) {
-    return res
-      .status(400)
-      .json({
-        error:
-          "Query parameters 'name', 'latitude', and 'longitude' are required",
-      });
+    return res.status(400).json({
+      error:
+        "Query parameters 'name', 'latitude', and 'longitude' are required",
+    });
   }
 
   console.log(
@@ -169,8 +168,10 @@ app.get("/api/foursquare-venue-id", async (req, res) => {
 
     if (response.data.results.length > 0) {
       const venueId = response.data.results[0].fsq_id;
+      console.log("Found venue ID:", venueId);
       res.json({ venueId });
     } else {
+      console.log("Venue not found");
       res.status(404).json({ error: "Venue not found" });
     }
   } catch (error) {
