@@ -5,6 +5,7 @@ const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
 const yelpApiKey = process.env.YELP_API_KEY;
+const tomtomApiKey = process.env.TOMTOM_API_KEY;
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
@@ -79,6 +80,7 @@ app.get("/api/restaurants", async (req, res) => {
   }
 });
 
+// Yelp business details endpoint
 app.get("/api/yelp/business/:id", async (req, res) => {
   const { id } = req.params;
   console.log(`Fetching details for restaurant ID: ${id}`);
@@ -104,6 +106,35 @@ app.get("/api/yelp/business/:id", async (req, res) => {
     });
   }
 });
+
+// TomTom API for Add Experience Page
+app.get("/api/tomtom/restaurants", async (req, res) => {
+  console.log('Received request with query:', req.query);
+  const { latitude, longitude, query } = req.query;
+
+  try {
+    const response = await axios.get(
+      `https://api.tomtom.com/search/2/poiSearch/${query}.json`, {
+        params: {
+          key: process.env.TOMTOM_API_KEY,
+          lat: latitude,
+          lon: longitude,
+          limit: 15,
+          radius: 10000,
+          categorySet: '7315',
+        },
+      }
+    );
+
+    console.log('TomTom API response:', response.data);
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error('Error fetching data from TomTom API:', error.message);
+    res.status(500).json({ error: 'Error fetching data from TomTom API' });
+  }
+});
+
+
 
 // Keep-alive endpoint
 app.get("/keep-alive", async (req, res) => {
